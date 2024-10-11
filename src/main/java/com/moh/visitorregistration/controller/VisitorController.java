@@ -15,7 +15,9 @@ import java.util.Map;
 
 
 
+
 @CrossOrigin(origins = "http://10.5.163.50:3000")
+
 @RestController
 @RequestMapping("/api/visitors")
 public class VisitorController {

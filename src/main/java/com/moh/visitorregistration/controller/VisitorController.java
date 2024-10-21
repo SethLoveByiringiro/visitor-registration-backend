@@ -9,19 +9,17 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 
-
-@CrossOrigin(origins = "http://10.5.163.50:3000")
-
 @RestController
 @RequestMapping("/api/visitors")
 public class VisitorController {
-
     private final VisitorService visitorService;
 
     @Autowired
@@ -32,12 +30,14 @@ public class VisitorController {
     @PostMapping("/register")
     public ResponseEntity<?> registerVisitor(@Valid @RequestBody Visitor visitor) {
         try {
+
             Visitor registeredVisitor = visitorService.registerVisitor(visitor);
             return ResponseEntity.ok(registeredVisitor);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
     @GetMapping("/search")
     public ResponseEntity<List<Visitor>> searchVisitors(@RequestParam String name) {
         List<Visitor> visitors = visitorService.searchVisitorsByName(name);
@@ -50,12 +50,22 @@ public class VisitorController {
         return ResponseEntity.ok(visitors);
     }
 
-
-
     @PutMapping("/{id}/departure")
     public ResponseEntity<Visitor> recordDeparture(@PathVariable Long id) {
-        Visitor updatedVisitor = visitorService.recordDeparture(id);
+        ZoneId zoneId = ZoneId.of("Africa/Kigali");
+        LocalTime departureTime = LocalTime.now(zoneId).withNano(0); // Remove nanoseconds
+        Visitor updatedVisitor = visitorService.recordDeparture(id, departureTime);
         return ResponseEntity.ok(updatedVisitor);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Visitor> updateVisitor(@PathVariable Long id, @Valid @RequestBody Visitor visitorDetails) {
+        try {
+            Visitor updatedVisitor = visitorService.updateVisitor(id, visitorDetails);
+            return ResponseEntity.ok(updatedVisitor);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

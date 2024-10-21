@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 
 @Data
 @Entity
@@ -49,11 +50,13 @@ public class Visitor {
 
     @PrePersist
     protected void onCreate() {
+        ZoneId zoneId = ZoneId.of("Africa/Kigali");
         if (visitDate == null) {
-            visitDate = LocalDate.now();
+            visitDate = LocalDate.now(zoneId);
         }
         if (arrivalTime == null) {
-            arrivalTime = LocalTime.now();
+            arrivalTime = LocalTime.now(zoneId).withNano(0); // Set arrival time without nanoseconds
         }
     }
+
 }
